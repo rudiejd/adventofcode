@@ -24,15 +24,11 @@ int main(int argc, char** argv) {
     int score = 0;
     for (string line; getline(stream, line);) {
         char need = line[2], opp = line[0];
-        cout << "opponent: " << opp << " i play: ";
         if (need == 'Z') {
-            cout << " to win " << beats[opp] << endl;
             score += 6 + points[beats[opp]];
         } else if (need == 'X') {
           score += points[loses[opp]]; 
-          cout << " to lose " << loses[opp] << endl;
         } else {
-            cout << "to draw " << endl;
           score += 3 + points[opp];
         }
     }
