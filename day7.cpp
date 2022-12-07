@@ -11,19 +11,17 @@
 using namespace std;
 
 unordered_map<string, vector<string>> fileTree;
+unordered_map<string, string> parent;
 unordered_map<string, int> dirSizes;
 unordered_set<string> computedList;
 
-int getAdditionalSize(const string& dir) {
-    int ret = 0;
+void getAdditionalSize(const string& dir) {
+    if (computedList.find(dir) != computedList.end()) return;
     for (string child : fileTree[dir]) {
-        ret += dirSizes[child];
-        if (computedList.find(child) == computedList.end()) {
-            ret += getAdditionalSize(child);
-        }
+        getAdditionalSize(child);
+        dirSizes[dir] += dirSizes[child];
     }
     computedList.insert(dir);
-    return ret;
 }
 
 int main(int argc, char** argv) {
@@ -33,7 +31,14 @@ int main(int argc, char** argv) {
         istringstream iss(line);
         if (line[0] == '$') {
             if (line.find("cd") != string::npos) {
-                iss >> directoryName >> directoryName >> directoryName;
+                string changedName;
+                iss >> changedName >> changedName >> changedName;
+                if (changedName == "..") {
+                    directoryName = parent[directoryName];
+                } else {
+                    directoryName = changedName;
+                }
+                cout << "changed to " << directoryName << endl;
                 if (fileTree.find(directoryName) == fileTree.end()) {
                     vector<string> v;
                     fileTree[directoryName] = v;
@@ -42,6 +47,7 @@ int main(int argc, char** argv) {
         } else if (line.find("dir ") == 0) {
             string childDir;
             iss >> childDir >> childDir;
+            parent[childDir] = directoryName;
             fileTree[directoryName].push_back(childDir);
             
             if (fileTree.find(childDir) != fileTree.end()) {
@@ -56,11 +62,10 @@ int main(int argc, char** argv) {
         }
     }
     for (auto e : fileTree) {
-        dirSizes[e.first] += getAdditionalSize(e.first);
+        getAdditionalSize(e.first);
     }
     int score = 0;
     for (auto e : dirSizes) {
-        cout << e.first << ": " << e.second << endl;
         if (e.second <= 100000) score += e.second;
     }
     cout << score << endl;
