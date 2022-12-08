@@ -24,6 +24,7 @@ void getAdditionalSize(const string& dir) {
     computedList.insert(dir);
 }
 
+
 int main(int argc, char** argv) {
     ifstream ifs(argv[1]);
     string directoryName = "";
@@ -35,6 +36,10 @@ int main(int argc, char** argv) {
                 iss >> changedName >> changedName >> changedName;
                 if (changedName == "..") {
                     directoryName = parent[directoryName];
+                } else if (directoryName == "/"){
+                    directoryName = directoryName + "/" + changedName;
+                } else if (!directoryName.empty()){
+                    directoryName = directoryName + "/" + changedName;
                 } else {
                     directoryName = changedName;
                 }
@@ -47,6 +52,7 @@ int main(int argc, char** argv) {
         } else if (line.find("dir ") == 0) {
             string childDir;
             iss >> childDir >> childDir;
+            childDir = directoryName + "/" + childDir;
             parent[childDir] = directoryName;
             fileTree[directoryName].push_back(childDir);
             
@@ -61,14 +67,20 @@ int main(int argc, char** argv) {
 
         }
     }
+    unsigned long long totalSize = 0;
     for (auto e : fileTree) {
         getAdditionalSize(e.first);
+        totalSize += dirSizes[e.first];
     }
+    auto remainingCapacity = 70000000 - dirSizes["/"];
     int score = 0;
+    auto minSize = ULLONG_MAX;
+    string part2 = "";
     for (auto e : dirSizes) {
         if (e.second <= 100000) score += e.second;
+        if (remainingCapacity + e.second >= 30000000) minSize = min(minSize, (unsigned long long) e.second);
     }
-    cout << score << endl;
+    cout << "part 1 score " << score <<  " part 2 answer " << minSize << endl;
     return 0;
 }
 
