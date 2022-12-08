@@ -36,8 +36,6 @@ int main(int argc, char** argv) {
                 iss >> changedName >> changedName >> changedName;
                 if (changedName == "..") {
                     directoryName = parent[directoryName];
-                } else if (directoryName == "/"){
-                    directoryName = directoryName + "/" + changedName;
                 } else if (!directoryName.empty()){
                     directoryName = directoryName + "/" + changedName;
                 } else {
@@ -45,8 +43,7 @@ int main(int argc, char** argv) {
                 }
                 cout << "changed to " << directoryName << endl;
                 if (fileTree.find(directoryName) == fileTree.end()) {
-                    vector<string> v;
-                    fileTree[directoryName] = v;
+                    fileTree[directoryName] = {};
                 }
             }
         } else if (line.find("dir ") == 0) {
@@ -55,22 +52,19 @@ int main(int argc, char** argv) {
             childDir = directoryName + "/" + childDir;
             parent[childDir] = directoryName;
             fileTree[directoryName].push_back(childDir);
-            
+
             if (fileTree.find(childDir) != fileTree.end()) {
-                vector<string> v;
-                fileTree[childDir] = v;
+                fileTree[childDir] = {};
             }
         } else {
             int fileSize;
             iss >> fileSize;
             dirSizes[directoryName] += fileSize;
-
         }
     }
-    unsigned long long totalSize = 0;
+
     for (auto e : fileTree) {
         getAdditionalSize(e.first);
-        totalSize += dirSizes[e.first];
     }
     auto remainingCapacity = 70000000 - dirSizes["/"];
     int score = 0;
