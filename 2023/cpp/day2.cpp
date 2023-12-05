@@ -1,15 +1,16 @@
 #include <fstream>
-#include <iostream>
+#include <string>
 #include <sstream>
+#include <iostream>
+#include <string>
 #include <unordered_map>
 #include <unordered_set>
 
 using namespace std;
-;
 
-void trimRightDelimiter(string &str) {
-  if (!isalpha(str[str.size() - 1])) {
-    str.erase(str.size() - 1);
+void trimRightDelimiter(string &s) {
+  if (!isalpha(s.back())) {
+      s.pop_back();
   }
 }
 
@@ -31,7 +32,7 @@ int getColorCounts(istringstream &ss, int id) {
   auto maxCounts = getDesiredColorCounts();
   while (ss >> count >> color) {
     trimRightDelimiter(color);
-    cout << "count: " << count << " color: " << color << endl;
+    std::cout << "count: " << count << " color: " << color << endl;
     if (stoi(count) > maxCounts[color]) {
         satisifed.erase(color);
     }
@@ -39,7 +40,7 @@ int getColorCounts(istringstream &ss, int id) {
   }
 
   if (satisifed.size() == maxCounts.size()) {
-    cout << "Game " << id << " is valid" << endl;
+    std::cout << "Game " << id << " is valid" << endl;
     return id;
   }
 
@@ -53,7 +54,6 @@ int getColorPowers(istringstream& ss, int id) {
 
   while (ss >> count >> color) {
     trimRightDelimiter(color);
-    cout << "count: " << count << " color: " << color << endl;
     auto countNumber = stoi(count);
     if (countNumber > necessaryCubes[color]) {
         necessaryCubes[color] = countNumber;
@@ -85,7 +85,7 @@ void part1(const string& fileName) {
 
     id++;
   }
-  cout << acc << endl;
+  std::cout << "part 1: " << acc << endl;
 }
 
 void part2(const string& fileName) {
@@ -104,7 +104,7 @@ void part2(const string& fileName) {
 
     id++;
   }
-  cout << acc << endl;
+  std::cout << "part 2" << acc << endl;
 
 }
 
