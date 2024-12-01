@@ -9,6 +9,19 @@ defmodule Day1Test do
     |> Enum.map(&String.split(&1))
     |> Enum.filter(&length(&1) > 1)
 
-    IO.inspect(Day1.day1(numbers))
+    first_locations =
+      numbers
+      |> Enum.map(&List.first(&1))
+      |> Enum.map(&Integer.parse(&1))
+      |> Enum.map(&elem(&1, 0))
+
+    second_locations =
+      numbers
+      |> Enum.map(&List.last(&1))
+      |> Enum.map(&Integer.parse(&1))
+      |> Enum.map(&elem(&1, 0))
+
+    IO.inspect(Day1.part1(first_locations, second_locations))
+    IO.inspect(Day1.part2(first_locations, second_locations))
   end
 end
