@@ -77,21 +77,21 @@ Update your analysis by handling situations where the Problem Dampener can remov
   """
   @spec is_report_safe?(list(String.t())) :: boolean()
   def is_report_safe?(report) when is_list(report) do
-    res = Enum.reduce(report, %{ascending: nil, last: nil, valid: true, invalid_count: 0}, fn level, acc ->
+    res = Enum.reduce(report, %{ascending: nil, last: nil, valid: true}, fn level, acc ->
       currently_ascending = if acc[:last] == nil, do: nil, else: level > acc[:last]
       monotonic? = acc[:ascending] == nil or currently_ascending == acc[:ascending]
       difference_valid? = acc[:last] == nil or (abs(level - acc[:last]) >= 1 and abs(level - acc[:last]) <= 3)
 
       valid? = monotonic? and difference_valid?
-      invalid_count = if not valid?, do: acc[:invalid_count] + 1, else: acc[:invalid_count]
       new_ascending = if not valid?, do: acc[:ascending], else: currently_ascending 
       new_last = if not valid?, do: acc[:last], else: level 
-      %{acc | ascending: new_ascending, last: new_last, valid: acc[:valid] and valid?, invalid_count: invalid_count} 
+      %{acc | ascending: new_ascending, last: new_last, valid: acc[:valid] and valid? } 
     end)
     res[:valid]
   end
 
-  # todo: this could be better :')
+  # todo: this could be better maybe?
+  # total time to run both part 1 and 2 = 0.03 seconds
   def is_report_nearly_safe?(report) when is_list(report) do
     Enum.any?(0..length(report), 
       &List.delete_at(report, &1) |> is_report_safe?())
