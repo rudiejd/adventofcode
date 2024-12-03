@@ -56,25 +56,24 @@ Update your analysis by handling situations where the Problem Dampener can remov
   ## Examples
 
       iex> Day2.is_report_safe?([7, 6, 4, 2, 1])
-      {:true, :true}
+      true
 
       iex> Day2.is_report_safe?([8, 1, 7, 6, 5, 4])
-      {:false, :true}
 
       iex> Day2.is_report_safe?([1, 9, 8, 7, 6, 5])
-      {:false, :true}
+      false
 
       iex> Day2.is_report_safe?([9, 2, 8, 7, 6, 5])
-      {:false, :true}
+      false
 
       iex> Day2.is_report_safe?([9, 8, 7, 6, 5, 10])
-      {:false, :true}
+      false
 
       iex> Day2.is_report_safe?([9, 90, 7, 6, 5, 4])
-      {:false, :true}
+      false
 
       iex> Day2.is_report_safe?([72, 69, 67, 65, 63, 62])
-      {:false, :true}
+      false
   """
   @spec is_report_safe?(list(String.t())) :: boolean()
   def is_report_safe?(report) when is_list(report) do
@@ -89,9 +88,13 @@ Update your analysis by handling situations where the Problem Dampener can remov
       new_last = if not valid?, do: acc[:last], else: level 
       %{acc | ascending: new_ascending, last: new_last, valid: acc[:valid] and valid?, invalid_count: invalid_count} 
     end)
+    res[:valid]
+  end
 
-    {res[:valid], res[:invalid_count] <= 1 or elem(is_report_safe?(tl(report)), 0)}
-
+  # todo: this could be better :')
+  def is_report_nearly_safe?(report) when is_list(report) do
+    Enum.any?(0..length(report), 
+      &List.delete_at(report, &1) |> is_report_safe?())
   end
 
 end

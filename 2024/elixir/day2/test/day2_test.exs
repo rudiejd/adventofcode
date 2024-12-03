@@ -3,7 +3,7 @@ defmodule Day2Test do
   doctest Day2
 
   test "does the problem" do
-    {:ok, contents} = File.read("./test/day2example")
+    {:ok, contents} = File.read("./test/day2input")
     level_lists = contents
     |> String.trim()
     |> String.split("\n")
@@ -13,14 +13,10 @@ defmodule Day2Test do
       |> Enum.map(fn s -> String.to_integer(s) end)
       )
 
-    res = Enum.reduce(level_lists, 0, fn lst, acc -> 
-      if elem(Day2.is_report_safe?(lst), 0) == :true, do: acc + 1, else: acc
-    end)
-    IO.inspect(res)
+    part1 = Enum.count(level_lists, &Day2.is_report_safe?(&1))
+    IO.inspect(part1)
 
-    part2answer = Enum.reduce(level_lists, 0, fn lst, acc -> 
-      if elem(Day2.is_report_safe?(lst), 1) == :true, do: acc + 1, else: acc
-    end)
-    IO.inspect(part2answer)
+    part2 = Enum.count(level_lists, &Day2.is_report_nearly_safe?(&1))
+    IO.inspect(part2)
   end
 end
