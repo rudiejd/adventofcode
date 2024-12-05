@@ -39,6 +39,7 @@ defmodule Day4 do
  Take a look at the little Elf's word search. How many times does XMAS appear?
 """
 
+<<<<<<< HEAD
 @dirs [{0, 1}, {1, 0}, {1, 1}, {0, -1}, {-1, 0}, {-1, -1}, {1, -1}, {-1, 1}]
 
 # TODO turn this into a map
