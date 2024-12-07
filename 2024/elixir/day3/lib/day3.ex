@@ -36,31 +36,28 @@ defmodule Day3 do
     end)
   end
 
-  defp do_part2("don't()" <> rest, acc, _) do
-    do_part2(rest, acc, false)
+  @doc """
+
+  ## Examples
+
+      iex> Day3.part2("xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))")
+      48
+
+  """
+  def part2(str), do: do_part2(str, 0, :enabled)
+
+  defp do_part2(str, acc, :enabled) do
+    case Regex.split(~r/don't\(\)/, str, parts: 2) do
+      [enabled_part, disabled_part] -> part1(enabled_part) + do_part2(disabled_part, acc, :disabled)
+      [enabled_part] -> acc + part1(enabled_part)
+    end
   end
 
-  defp do_part2("do()" <> rest, acc, _) do
-    do_part2(rest, acc, true)
+  defp do_part2(str, acc, :disabled) do
+    case Regex.split(~r/do\(\)/, str, parts: 2) do
+      [_disabled_part, enabled_part] -> do_part2(enabled_part, acc, :enabled)
+      [_disabled_part] -> acc 
+    end
   end
 
-  defp do_part2("mul(" <> rest = str, acc, enabled) do
-    [_, x, y] = Regex.run(~r/mul\((\d+),(\d+)\)/, str)
-    inc = if enabled, do: String.to_integer(x) * String.to_integer(y), else: 0
-    do_part2(rest, acc + inc, enabled)
-  end
-
-  defp do_part2("", acc, _) do
-    acc
-  end
-
-  defp do_part2(str, acc, enabled) do
-    IO.inspect(acc)
-    do_part2(String.slice(str, 1..String.length(str)), acc, enabled)
-  end
-
-
-  def part2(str) do
-    do_part2(str, 0, true)
-  end
 end
