@@ -4,12 +4,24 @@ defmodule Day4Test do
 
   test "do the problem" do
     contents = File.read!('./test/day4input')
-    rows = contents
-    |> String.split("\n")
-    |> Enum.map(&String.to_charlist/1)
-    |> Enum.reject(&length(&1) < 1)
 
-    IO.inspect(Day4.word_search(rows))
+    # I stole this
+    map = contents
+    |> String.split("\n")
+    |> Enum.with_index
+    |> Enum.flat_map(fn {line, row} ->
+      String.to_charlist(line)
+      |> Enum.with_index
+      |> Enum.flat_map(fn {char, col} ->
+        position = {row, col}
+        [{position, char}]
+      end)
+    end)
+    |> Map.new
+
+    IO.inspect(Day4.word_search(map))
+
+    
   end
 
 end

@@ -39,32 +39,26 @@ defmodule Day4 do
  Take a look at the little Elf's word search. How many times does XMAS appear?
 """
 
-<<<<<<< HEAD
 @dirs [{0, 1}, {1, 0}, {1, 1}, {0, -1}, {-1, 0}, {-1, -1}, {1, -1}, {-1, 1}]
 
-# TODO turn this into a map
-@spec at(list(list(String.t())), Position.t()) :: non_neg_integer()
-def at(grid, {x, y}) do
-  if length(grid) <= y or length(grid) <= x do
-    nil
-  else 
-    Enum.at(grid, y) |> Enum.at(x)
-  end
+def at(grid, pos) do
+  Map.get(grid, pos)
 end
 
 def go({x, y}, {x1, y1}) do
   {x + x1, y + y1}
 end
 
-defp do_word_search(grid, pos, []), do: 1 |> dbg()
-defp do_word_search(grid, pos, [first_char|rest]) do
+defp word_match?(grid, _pos, _dir, [], path) do
+:true
+end
+
+defp word_match?(grid, pos, dir, [first_char|rest], path \\ []) do
   case at(grid, pos) do
      ^first_char -> 
-      Enum.reduce(@dirs, 0, fn d, acc -> 
-        acc + do_word_search(grid, go(pos, d), rest) end)
-     _ -> 0
+        word_match?(grid, go(pos, dir), dir, rest, path ++ [pos])
+     _ -> :false
   end
-  
 end
 
 @doc """
@@ -72,11 +66,14 @@ end
   Check the number of times "XMAS" occurs in a word search
 """
 # reduce the grid, try moving in every direction, check if the match exists
-@spec word_search(list(list(String.t()))) :: non_neg_integer()
 def word_search(grid) do
-  Enum.reduce(0..length(grid), 0, fn y, acc ->
-    acc + Enum.reduce(0..length(grid), 0, fn x, a -> 
-      a + do_word_search(grid, {x, y}, ~c'XMAS')
+  Enum.reduce(grid, 0, fn {pos, _}, cnt ->
+    @dirs
+    |> Enum.reduce(cnt, fn dir, cnt ->
+      case word_match?(grid, pos, dir, ~c'XMAS') do
+         true -> cnt + 1
+         false -> cnt
+      end
     end)
   end)
 end
