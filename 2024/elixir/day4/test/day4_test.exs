@@ -20,6 +20,7 @@ defmodule Day4Test do
     |> Map.new
 
     IO.inspect(Day4.word_search(map))
+    IO.inspect(Day4.x_search(map))
 
     
   end

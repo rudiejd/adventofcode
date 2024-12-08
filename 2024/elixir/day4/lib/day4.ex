@@ -40,6 +40,7 @@ defmodule Day4 do
 """
 
 @dirs [{0, 1}, {1, 0}, {1, 1}, {0, -1}, {-1, 0}, {-1, -1}, {1, -1}, {-1, 1}]
+@diags [{-1, 1}, {1, 1}, {1, -1}, {-1, -1}]
 
 def at(grid, pos) do
   Map.get(grid, pos)
@@ -60,6 +61,9 @@ defp word_match?(grid, pos, dir, [first_char|rest], path \\ []) do
      _ -> :false
   end
 end
+defp word_match?(grid, _pos, _dir, [], path) do
+:true
+end
 
 @doc """
 
@@ -75,6 +79,32 @@ def word_search(grid) do
          false -> cnt
       end
     end)
+  end)
+end
+
+defp flip_x({x, y}), do: {-x, y}
+
+defp flip_y({x, y}), do: {x, -y}
+
+defp reverse({x, y}), do: {-x, -y}
+
+
+def x_search(grid) do
+  Enum.reduce(grid, 0, fn {pos, val}, cnt ->
+    case val do 
+      ?A -> 
+        matched = @diags
+        |> Enum.any?(fn dir->
+          word_match?(grid, go(pos, reverse(dir)), dir, ~c"MAS") and 
+            (word_match?(grid, go(pos, dir |> flip_x |> reverse), dir |> flip_x, ~c"MAS") or word_match?(grid, go(pos, dir |> flip_y |> reverse), dir |> flip_y, ~c"MAS"))
+        end)
+
+        case matched do
+          true -> cnt + 1
+          false -> cnt
+        end
+      _ -> cnt
+    end
   end)
 end
 
