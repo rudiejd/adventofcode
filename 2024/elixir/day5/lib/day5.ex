@@ -3,18 +3,42 @@ defmodule Day5 do
   Documentation for `Day5`.
   """
 
-  def apply_ordering(rules, updates) do
-    updates
-    |> Enum.reduce(0, fn update, acc -> 
-
-      out_of_order = Enum.with_index(update)
+  def out_of_order(update, rules) do
+      Enum.with_index(update)
       |> Enum.any?(fn {val, idx} -> 
         Enum.slice(update, 0, idx)
         |> Enum.any?(&rules[val] && MapSet.member?(rules[val], &1))
         end)
-      case out_of_order do
+  end
+
+  def part1(rules, updates) do
+    updates
+    |> Enum.reduce(0, fn update, acc -> 
+      case out_of_order(update, rules) do
         true -> acc
         false -> acc + Enum.at(update, div(length(update), 2))
+      end
+    end)
+  end
+
+  def goes_before(a, b, rules) do
+      rules_a = Map.get(rules, a)
+      rules_a != nil && MapSet.member?(rules_a, b)
+  end
+
+  def reorder(update, rules) do
+    Enum.sort(update, fn a, b -> 
+      goes_before(a, b, rules)
+    end)
+  end
+
+  def part2(rules, updates) do
+    updates
+    |> Enum.reduce(0, fn update, acc -> 
+      case out_of_order(update, rules) do
+        true -> 
+        acc + Enum.at(reorder(update, rules), div(length(update), 2))
+        _ -> acc 
       end
     end)
   end

@@ -3,17 +3,9 @@ defmodule Day5Test do
   doctest Day5
 
   test "do the problem" do
-    [raw_rules, raw_updates] = File.read!('./test/day5input')
-    |> String.split("\n\n", parts: 2)
 
-    rules = raw_rules
-    |> String.split("\n")
-    |> Enum.flat_map(fn val -> 
-      parts = val
-      |> String.split("|")
-      [left, right] = parts
-      [{String.to_integer(left), String.to_integer(right)}]
-    end)
-
+    {rules, updates} = Day5.read_input()
+    Day5.part1(rules, updates) |> IO.inspect()
+    Day5.part2(rules, updates) |> IO.inspect()
   end
 end
