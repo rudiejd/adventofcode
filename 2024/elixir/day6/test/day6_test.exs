@@ -4,20 +4,7 @@ defmodule Day6Test do
 
   test "do the problem" do
 
-    contents = File.read!('./test/day6input')
-
-    # I stole this from the other problem!
-    map = contents
-    |> String.split("\n")
-    |> Enum.with_index
-    |> Enum.flat_map(fn {line, row} ->
-      String.to_charlist(line)
-      |> Enum.with_index
-      |> Enum.flat_map(fn {char, col} ->
-        position = {row, col}
-        [{position, char}]
-      end)
-    end)
-    |> Map.new
+    grid = Day6.read_input()
+    IO.inspect(Day6.part1(grid))
   end
 end
