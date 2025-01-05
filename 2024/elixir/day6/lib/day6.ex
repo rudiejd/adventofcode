@@ -7,33 +7,6 @@ defmodule Day6 do
     {x + x1, y + y1}
   end
 
-  def print_grid(explored, pos, grid) do
-    for y <- 0..length(Map.keys(grid)) do
-      for x <- 0..length(Map.keys(grid)) do
-        cond do
-          {x, y} in explored ->
-            IO.write("X")
-
-          {x, y} == pos ->
-            IO.write("^")
-
-          Map.has_key?(grid, {x, y}) ->
-            case grid[{x, y}] do
-              ?^ -> IO.write(".")
-              _ -> IO.write(List.to_string([grid[{x, y}]]))
-            end
-
-          true ->
-            "?"
-        end
-      end
-
-      IO.write("\n")
-    end
-
-    IO.write("\n\n")
-  end
-
   @dir_idx %{{0, -1} => 0, {1, 0} => 1, {0, 1} => 2, {-1, 0} => 3}
   @dirs %{0 => {0, -1}, 1 => {1, 0}, 2 => {0, 1}, 3 => {-1, 0}}
   defp guard_wander(grid, guard_pos, dir \\ {0, -1}, explored \\ %MapSet{}) do
@@ -81,40 +54,28 @@ defmodule Day6 do
       end
 
     cond do
-      loop? -> true
+      loop? -> 1
       not is_nil(next_pos) -> guard_wander_check_loops(grid, next_pos, dir, explored)
-      true -> false
+      true -> 0
     end
   end
 
-  def part1(grid) do
-    {guard_pos, _val} =
-      grid
-      |> Enum.filter(fn {{_, _}, val} -> val == ?^ end)
-      |> hd
-
-    guard_wander(grid, guard_pos)
-  end
-
-  def part2(grid, len) do
+  defp get_guard_pos(grid) do
     {guard_pos, _val} =
       grid
       |> Enum.find(fn {{_, _}, val} -> val == ?^ end)
+    guard_pos
+  end
 
-    new_obstacles = 
-      for y <- 0..len-1 do
-        for x <- 0..len-1 do
-          IO.inspect({x, y})
-          if guard_wander_check_loops(Map.put(grid, {x, y}, ?O), guard_pos) do 
-            1
-          else
-            0
-          end
-      end
-    end
+  def part1(grid) do
+    guard_wander(grid, get_guard_pos(grid))
+  end
 
-    Enum.reduce(new_obstacles, 0, fn x, acc -> acc + Enum.sum(x) end)
-    |> IO.inspect()
+  def part2(grid, len) do
+    guard_pos = get_guard_pos(grid)
+
+    coords = for x <- 0..len-1, y <- 0..len-1, do: {x, y}
+    Enum.reduce(coords, 0, &(&2 + guard_wander_check_loops(grid |> Map.put(&1, ?O), guard_pos)))
   end
 
   def read_input() do
@@ -127,10 +88,10 @@ defmodule Day6 do
     # I stole this from the other problem!
     map =
       lines
-      |> Enum.with_index()
-      |> Enum.flat_map(fn {line, row} ->
+      |> Stream.with_index()
+      |> Stream.flat_map(fn {line, row} ->
         String.to_charlist(line)
-        |> Enum.with_index()
+        |> Stream.with_index()
         |> Enum.map(fn {char, col} ->
           {{col, row}, char}
         end)
