@@ -55,32 +55,35 @@ defmodule Day6 do
     end
   end
 
-  def check_loop(grid, guard_pos, explored \\ %{})
-    facing = go(guard_pos, dir)
-    dirs_at_pos = Map.get(explored, guard_pos, MapSet.new()) |> MapSet.put(dir)
-  end
-
-
   defp guard_wander_check_loops(grid, guard_pos, dir \\ {0, -1}, explored \\ %{}) do
     facing = go(guard_pos, dir)
 
-    dirs_at_pos = Map.get(explored, guard_pos, MapSet.new()) |> MapSet.put(dir)
+    # explored = postion => (all directions we've gone from that position)
+    # if we go the same direction twice, loop detected
+    visited_dirs = Map.get(explored, guard_pos, MapSet.new()) 
+    loop? = MapSet.member?(visited_dirs, dir)
+
+    dirs_at_pos = 
+      visited_dirs
+      |> MapSet.put(dir)
 
     explored =
       Map.put(explored, guard_pos, dirs_at_pos)
 
+
     {next_pos, dir} =
       case grid[facing] do
         ?# -> {guard_pos, @dirs[rem(@dir_idx[dir] + 1, length(Map.keys(@dirs)))]}
+        ?O -> {guard_pos, @dirs[rem(@dir_idx[dir] + 1, length(Map.keys(@dirs)))]}
         ?. -> {facing, dir}
         ?^ -> {facing, dir}
         nil -> {nil, nil}
       end
 
-    if not is_nil(next_pos) do
-      guard_wander(grid, next_pos, dir, explored)
-    else
-      MapSet.size(explored)
+    cond do
+      loop? -> true
+      not is_nil(next_pos) -> guard_wander_check_loops(grid, next_pos, dir, explored)
+      true -> false
     end
   end
 
@@ -93,22 +96,37 @@ defmodule Day6 do
     guard_wander(grid, guard_pos)
   end
 
-  def part2(grid) do
+  def part2(grid, len) do
     {guard_pos, _val} =
       grid
-      |> Enum.filter(fn {{_, _}, val} -> val == ?^ end)
-      |> hd
+      |> Enum.find(fn {{_, _}, val} -> val == ?^ end)
 
-    guard_wander_check_loops(grid, guard_pos)
+    new_obstacles = 
+      for y <- 0..len-1 do
+        for x <- 0..len-1 do
+          IO.inspect({x, y})
+          if guard_wander_check_loops(Map.put(grid, {x, y}, ?O), guard_pos) do 
+            1
+          else
+            0
+          end
+      end
+    end
+
+    Enum.reduce(new_obstacles, 0, fn x, acc -> acc + Enum.sum(x) end)
+    |> IO.inspect()
   end
 
   def read_input() do
     contents = File.read!(~c"./test/day6input")
 
+    lines = contents
+      |> String.split("\n")
+
+    len = length(lines)
     # I stole this from the other problem!
     map =
-      contents
-      |> String.split("\n")
+      lines
       |> Enum.with_index()
       |> Enum.flat_map(fn {line, row} ->
         String.to_charlist(line)
@@ -118,5 +136,7 @@ defmodule Day6 do
         end)
       end)
       |> Map.new()
+
+    {map, len}
   end
 end
