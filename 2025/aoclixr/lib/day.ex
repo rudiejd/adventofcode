@@ -4,7 +4,7 @@ defmodule Day do
       def run_puzzle() do
         line_list =
           __MODULE__
-          |> Kernel.inspect()
+          |> inspect()
           |> String.downcase()
           |> then(fn s -> "input/#{s}_input.txt" end)
           |> Util.read_line_array_from_file()
@@ -21,7 +21,7 @@ defmodule Day do
       def run_sample() do
         line_list =
           __MODULE__
-          |> IO.inspect()
+          |> inspect()
           |> String.downcase()
           |> then(fn s -> "input/#{s}_sample.txt" end)
           |> Util.read_line_array_from_file()
